@@ -2,6 +2,7 @@ package com.example.podometre;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView stepsText;
     private List<Sensor> deviceSensors;
 
-    private Boolean boolSensorStepCounter;
+    private Boolean isSensorPresent;
     
     private Sensor sensorStepCounter;
     private Sensor sensorStepDetector;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null) {
             sensorStepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-            boolSensorStepCounter = true;
+            isSensorPresent = true;
         } else {
             Toast.makeText(getApplicationContext(), "Pas de capteur \"STEP COUNTER\" présent dans l'appareil.", Toast.LENGTH_SHORT).show();
         }
@@ -68,13 +69,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
             sensorStepDetector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            boolSensorStepCounter = true;
+            isSensorPresent = true;
         } else {
             Toast.makeText(getApplicationContext(), "Pas de capteur \"STEP DETECTOR\" présent dans l'appareil.", Toast.LENGTH_SHORT).show();
         }
 
+
+        if (isSensorPresent) {
+            sensorManager.registerListener(this, sensorStepCounter, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManager.registerListener(this, sensorStepDetector, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+
         getData(todayDate);
     }
+
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return Service.START_STICKY;
+    }
+
 
     public void getData(String todayDate) {
         stepsDBHelper = new StepsDBHelper(this);
@@ -119,10 +132,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
-        if (boolSensorStepCounter) {
+        if (isSensorPresent) {
             sensorManager.registerListener(this, sensorStepCounter, SensorManager.SENSOR_DELAY_NORMAL);
             sensorManager.registerListener(this, sensorStepDetector, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -131,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
-        if (boolSensorStepCounter) {
+        if (isSensorPresent) {
             sensorManager.unregisterListener(this);
         }
-    }
+    }*/
 }

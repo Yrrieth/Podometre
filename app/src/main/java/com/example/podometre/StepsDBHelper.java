@@ -17,6 +17,11 @@ public class StepsDBHelper extends SQLiteOpenHelper {
     private static final String STEPS_COUNT = "StepsCount";
     private static final String CREATION_DATE = "CreationDate";
 
+    Calendar calendar = Calendar.getInstance();
+    String todayDate = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
+            + String.valueOf(calendar.get(Calendar.MONTH) + 1)+ "/"
+            + String.valueOf(calendar.get(Calendar.YEAR));
+
     private static final String CREATE_TABLE_STEPS_SUMMARY = "CREATE TABLE " + TABLE_STEPS_SUMMARY
             + "("
             + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -41,10 +46,7 @@ public class StepsDBHelper extends SQLiteOpenHelper {
         boolean isDateAlreadyPresent = false;
         boolean createSuccessful = false;
         int currentDateStepCounts = 0;
-        Calendar calendar = Calendar.getInstance();
-        String todayDate = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
-                + String.valueOf(calendar.get(Calendar.MONTH) + 1)+ "/"
-                + String.valueOf(calendar.get(Calendar.YEAR));
+
 
         String selectQuery = "SELECT " + STEPS_COUNT + " FROM " + TABLE_STEPS_SUMMARY
                 + " WHERE " + CREATION_DATE + " = '" + todayDate + "'";
@@ -121,7 +123,12 @@ public class StepsDBHelper extends SQLiteOpenHelper {
             Cursor c = db.rawQuery(selectQuery, null);
 
             if (c.moveToFirst()) {
-                currentStepEntry.date = c.getString(c.getColumnIndex(CREATION_DATE));
+
+                if (currentStepEntry.date != null) {
+                    currentStepEntry.date = c.getString(c.getColumnIndex(CREATION_DATE));
+                } else {
+                    currentStepEntry.date = todayDate;
+                }
                 currentStepEntry.stepCount = c.getInt(c.getColumnIndex(STEPS_COUNT));
             }
         } catch (Exception e) {
