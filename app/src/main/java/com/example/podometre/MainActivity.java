@@ -10,6 +10,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView stepsSinceReboot;
     private TextView stepsText;
     private List<Sensor> deviceSensors;
+    private Button sendButton;
 
     private Boolean isSensorPresent;
     
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //sensorList = (TextView)findViewById(R.id.sensorList);
         stepsSinceReboot = (TextView) findViewById(R.id.stepsSinceReboot);
         stepsText = (TextView) findViewById(R.id.stepsText);
+        sendButton = (Button) findViewById(R.id.sendButton);
 
 
         sensorText = new StringBuffer();
@@ -82,6 +86,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
         getData(todayDate);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UploadFileAsync ufa = new UploadFileAsync();
+            }
+        });
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {

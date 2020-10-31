@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 public class StepsDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "StepsDataBase.db";
+    public static final String DATABASE_NAME = "StepsDataBase.db";
     private static final String TABLE_STEPS_SUMMARY = "StepsSummary";
     private static final String ID = "id";
     private static final String STEPS_COUNT = "StepsCount";
@@ -135,5 +135,9 @@ public class StepsDBHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return currentStepEntry;
+    }
+
+    public String getDatabaseName() {
+        return DATABASE_NAME;
     }
 }
