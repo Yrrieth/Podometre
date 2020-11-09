@@ -97,7 +97,7 @@ public class StepsDBHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_STEPS_SUMMARY;
 
         try {
-            SQLiteDatabase db = this. getReadableDatabase();
+            SQLiteDatabase db = this.getReadableDatabase();
             Cursor c = db.rawQuery(selectQuery, null);
             if (c.moveToFirst()) {
                 do {
@@ -114,7 +114,7 @@ public class StepsDBHelper extends SQLiteOpenHelper {
         return stepCountList;
     }
 
-    public DateStepsModel readCurrentDateStepEntry(String currentDate) {
+    public DateStepsModel getCurrentDateStepEntry(String currentDate) {
         DateStepsModel currentStepEntry = new DateStepsModel();
         String selectQuery = "SELECT * FROM " + TABLE_STEPS_SUMMARY + " WHERE " + CREATION_DATE + " = '" + currentDate + "'";
 

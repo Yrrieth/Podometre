@@ -29,8 +29,11 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... params) {
         try {
-            String sourceFileUri = params[0];
-            Uri.fromFile(context.getDatabasePath(StepsDBHelper.DATABASE_NAME)).toString();
+            //String sourceFileUri = params[0];
+            String sourceFileUri = Uri.fromFile(context.getDatabasePath(StepsDBHelper.DATABASE_NAME)).toString();
+            //String sourceFileUri = context.getDatabasePath("StepsDataBase.db").getPath();
+            //String fileName = params[1];
+
 
             HttpURLConnection connection = null;
             DataOutputStream dataOutputStream = null;
@@ -45,7 +48,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
             if (sourceFile.isFile()) {
                 try {
-                    String upLoadServerUri = "http://192.168.1.23/podometre/index.php";
+                    String upLoadServerUri = "http://192.168.1.23:80/podometre/index.php";
 
                     // Open a url connection to the servlet
                     FileInputStream fileInputStream = new FileInputStream(sourceFile);
@@ -65,7 +68,7 @@ public class UploadFileAsync extends AsyncTask<String, Void, String> {
 
                     dataOutputStream = new DataOutputStream(connection.getOutputStream());
                     dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                    dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"sqlite\";filename=\""
+                    dataOutputStream.writeBytes("Content-Disposition: form-data;name=\"sqlite\";filename=\""
                             + sourceFileUri + "\"" + lineEnd);
                     dataOutputStream.writeBytes(lineEnd);
 

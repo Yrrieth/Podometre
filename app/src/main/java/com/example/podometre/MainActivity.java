@@ -3,6 +3,7 @@ package com.example.podometre;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Service;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -10,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -39,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private StepsDBHelper stepsDBHelper;
     private ArrayList<DateStepsModel> stepCountList;
     private DateStepsModel currentDateStepEntry;
+
+    private Context context;
+    private ContentResolver contentResolver;
 
 
     Calendar calendar = Calendar.getInstance();
@@ -90,7 +95,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UploadFileAsync ufa = new UploadFileAsync();
+                //UploadFileAsync ufa = new UploadFileAsync(context, contentResolver);
+                //ufa.execute();
+                UploadDataAsync uda = new UploadDataAsync();
+                uda.execute();
+
+                Toast.makeText(getApplicationContext(), "Button is clicked.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -103,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void getData(String todayDate) {
         stepsDBHelper = new StepsDBHelper(this);
         stepCountList = stepsDBHelper.readStepsEntries();
-        currentDateStepEntry = stepsDBHelper.readCurrentDateStepEntry(todayDate);
+        currentDateStepEntry = stepsDBHelper.getCurrentDateStepEntry(todayDate);
         stepsText.setText(String.valueOf(currentDateStepEntry.date + "\nNombre de pas effectué :" + currentDateStepEntry.stepCount));
 
     }
@@ -134,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
             case(Sensor.TYPE_STEP_DETECTOR):
                 countSteps((int)event.values[0]);
-                currentDateStepEntry = stepsDBHelper.readCurrentDateStepEntry(todayDate);
+                currentDateStepEntry = stepsDBHelper.getCurrentDateStepEntry(todayDate);
                 stepsText.setText(String.valueOf(currentDateStepEntry.date + "\n" + currentDateStepEntry.stepCount));
                 stepsDBHelper.createStepsEntry();
                 break;
