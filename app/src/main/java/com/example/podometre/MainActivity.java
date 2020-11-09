@@ -18,9 +18,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -97,10 +107,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onClick(View v) {
                 //UploadFileAsync ufa = new UploadFileAsync(context, contentResolver);
                 //ufa.execute();
-                UploadDataAsync uda = new UploadDataAsync();
-                uda.execute();
+                //UploadDataAsync uda = new UploadDataAsync();
+                //uda.execute();
 
-                Toast.makeText(getApplicationContext(), "Button is clicked.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Button is clicked.", Toast.LENGTH_SHORT).show();
+
+
+                String url = "http://192.168.1.23/podometre/sql_connect.php";
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Toast.makeText(MainActivity.this, response.trim(), Toast.LENGTH_LONG).show();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("step_count", "39");
+                        params.put("date_creation", "09/11/2020");
+                        return params;
+                    }
+                };
+                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                requestQueue.add(stringRequest);
             }
         });
     }
