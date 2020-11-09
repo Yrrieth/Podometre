@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     @Override
                     protected Map<String, String> getParams() {
                         Map<String, String> params = new HashMap<String, String>();
-                        params.put("step_count", "39");
-                        params.put("date_creation", "09/11/2020");
+                        params.put("step_count", String.valueOf(currentDateStepEntry.stepCount)); // Cast de int en String
+                        params.put("date_creation", currentDateStepEntry.date);
                         return params;
                     }
                 };
