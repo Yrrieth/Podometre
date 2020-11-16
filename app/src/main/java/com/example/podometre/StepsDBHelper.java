@@ -9,6 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+class DateStepsModel {
+    public String date;
+    public int stepCount;
+}
+
 public class StepsDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "StepsDataBase.db";
