@@ -97,7 +97,7 @@ public class StepsDBHelper extends SQLiteOpenHelper {
         return createSuccessful;
     }
 
-    public ArrayList<DateStepsModel> readStepsEntries() {
+    public ArrayList<DateStepsModel> getAllStepsEntries() {
         ArrayList<DateStepsModel> stepCountList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_STEPS_SUMMARY;
 
@@ -140,9 +140,5 @@ public class StepsDBHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return currentStepEntry;
-    }
-
-    public String getDatabaseName() {
-        return DATABASE_NAME;
     }
 }

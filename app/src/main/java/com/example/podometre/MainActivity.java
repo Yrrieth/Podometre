@@ -23,8 +23,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ArrayList<DateStepsModel> stepCountList;
     private DateStepsModel currentDateStepEntry;
 
+    private JSONArray jsonArrayToPost;
+
     private Context context;
     private ContentResolver contentResolver;
 
@@ -71,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         stepsSinceReboot = (TextView) findViewById(R.id.stepsSinceReboot);
         stepsText = (TextView) findViewById(R.id.stepsText);
         sendButton = (Button) findViewById(R.id.sendButton);
-
 
         sensorText = new StringBuffer();
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -93,28 +98,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(getApplicationContext(), "Pas de capteur \"STEP DETECTOR\" présent dans l'appareil.", Toast.LENGTH_SHORT).show();
         }
 
-
         if (isSensorPresent) {
             sensorManager.registerListener(this, sensorStepCounter, SensorManager.SENSOR_DELAY_NORMAL);
             sensorManager.registerListener(this, sensorStepDetector, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-
         getData(todayDate);
+
+        jsonArrayToPost = putDataInJson(stepCountList);
+
+        Log.d("TAG ///////////////////", String.valueOf(jsonArrayToPost));
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //UploadFileAsync ufa = new UploadFileAsync(context, contentResolver);
-                //ufa.execute();
-                //UploadDataAsync uda = new UploadDataAsync();
-                //uda.execute();
-
-                //Toast.makeText(getApplicationContext(), "Button is clicked.", Toast.LENGTH_SHORT).show();
-
-
-                String url = "http://192.168.1.23/podometre/sql_connect.php";
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                getData(todayDate);
+                String url = "http://192.168.1.23/podometre/back/insert_step_entry.php";
+                jsonArrayToPost = putDataInJson(stepCountList);
+                /*StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -129,18 +130,47 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         }) {
                     @Override
                     protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<String, String>();
+                        Map<String, String> params = new HashMap<>();
                         params.put("step_count", String.valueOf(currentDateStepEntry.stepCount)); // Cast de int en String
                         params.put("date_creation", currentDateStepEntry.date);
                         return params;
                     }
                 };
                 RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
-                requestQueue.add(stringRequest);
+                requestQueue.add(stringRequest);*/
+
+                JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, jsonArrayToPost,
+                        new Response.Listener<JSONArray>() {
+                            @Override
+                            public void onResponse(JSONArray response) {
+                                try {
+                                    /*JSONArray jsonArrayResponse = response.getJSONArray(0);
+                                    JSONObject jsonObject = jsonArrayResponse.getJSONObject(0);
+                                    String result = jsonObject.getString("success");
+                                    Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();*/
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                Toast.makeText(MainActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                );
+                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                requestQueue.add(jsonArrayRequest);
             }
         });
     }
 
+    /**
+     * Pour que le programme reste actif même après l'avoir quitté
+     */
     public int onStartCommand(Intent intent, int flags, int startId) {
         return Service.START_STICKY;
     }
@@ -148,10 +178,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void getData(String todayDate) {
         stepsDBHelper = new StepsDBHelper(this);
-        stepCountList = stepsDBHelper.readStepsEntries();
+        stepCountList = stepsDBHelper.getAllStepsEntries();
         currentDateStepEntry = stepsDBHelper.getCurrentDateStepEntry(todayDate);
         stepsText.setText(String.valueOf(currentDateStepEntry.date + "\nNombre de pas effectué :" + currentDateStepEntry.stepCount));
 
+    }
+
+    public JSONArray putDataInJson (ArrayList<DateStepsModel> stepEntryList) {
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i < stepEntryList.size(); i++) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("step_count", String.valueOf(stepEntryList.get(i).stepCount));
+                jsonObject.put("date_creation", stepEntryList.get(i).date);
+                jsonArray.put(jsonObject);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return jsonArray;
     }
     /*private void listSensor () {
         for (Sensor sensor :  deviceSensors) {
@@ -188,21 +233,4 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
         }
     }
-
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        if (isSensorPresent) {
-            sensorManager.registerListener(this, sensorStepCounter, SensorManager.SENSOR_DELAY_NORMAL);
-            sensorManager.registerListener(this, sensorStepDetector, SensorManager.SENSOR_DELAY_NORMAL);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (isSensorPresent) {
-            sensorManager.unregisterListener(this);
-        }
-    }*/
 }
