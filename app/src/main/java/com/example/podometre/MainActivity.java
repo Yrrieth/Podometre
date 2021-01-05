@@ -180,8 +180,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         stepsDBHelper = new StepsDBHelper(this);
         stepCountList = stepsDBHelper.getAllStepsEntries();
         currentDateStepEntry = stepsDBHelper.getCurrentDateStepEntry(todayDate);
-        stepsText.setText(String.valueOf(currentDateStepEntry.date + "\nNombre de pas effectué :" + currentDateStepEntry.stepCount));
-
+        stepsText.setText(currentDateStepEntry.date + "\nNombre de pas effectué :" + currentDateStepEntry.stepCount);
     }
 
     public JSONArray putDataInJson (ArrayList<DateStepsModel> stepEntryList) {
@@ -189,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         for (int i = 0; i < stepEntryList.size(); i++) {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject.put("step_count", String.valueOf(stepEntryList.get(i).stepCount));
+                jsonObject.put("step_count", stepEntryList.get(i).stepCount);
                 jsonObject.put("date_creation", stepEntryList.get(i).date);
                 jsonArray.put(jsonObject);
             } catch (Exception e){
